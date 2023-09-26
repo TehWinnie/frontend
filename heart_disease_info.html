@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Info</title>
+    <link rel="stylesheet" href="real_main.css"> 
+    <style>
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* Align items horizontally */
+            align-items: center; /* Align items vertically */
+            background: #ffeaea;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            background: #ffeaea;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .navbar li {
+            margin-right: 15px;
+            margin: 0 10px; /* Add margin to separate links */
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: rgb(0, 0, 0);
+            display: block;
+            padding: 25px 0; /* Adjusted padding for center alignment */
+            font-size: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            width: 100%; /* Added this line to make links full width */
+        }
+
+        /* Position the Sign In link at the right */
+        .navbar .signin-link {
+            margin-right: 20px; 
+        }
+
+        .info-page {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start; /* Align content to the left */
+            background-color: #ffeaea;
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            padding-left: 50px; 
+        }
+
+        /* Style for disease boxes */
+        .disease-box {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .disease-box:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Style for the pop-up box */
+        .popup-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        /* Close button style */
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            border-radius: 50%; /* Make the button circular */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: red; /* Set initial symbol color to red */
+        }
+        /* Add any new CSS styles for hierarchical list here */
+        .disease-box ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        /* Add any new CSS styles for pop-up boxes here */
+        .popup-box ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+<ul>
+    <li><a href="real_main.html" target="_top">Home</a></li>
+    <li><a href="javascript:void(0);" onclick="checkAccess()" target="_top">Patients Medical Records</a></li>
+    <!-- <li><a href="chatbotUI.html" target="_top">Chat</a></li> -->
+    <li><a href="heart_disease_info.html" target="_top">Heart Disease Info</a></li>
+    <li><a href="aboutUs.html" target="_top">About Us</a></li>
+</ul>
+<div class="signin-link">
+    <a href="sign_in.html" target="_top">Sign In</a>
+</div>
+
+</div>
+
+<div id="myModal" class="w3-modal">
+<div class="w3-modal-content w3-animate-top w3-card-4">
+    <header class="w3-container w3-red"> 
+        <span onclick="closeModal()" class="w3-button-close w3-display-topright">&times;</span>
+        <h3>Access Restricted</h3>
+    </header>
+    <div class="w3-container">
+        <p>Access to the patient's record is presently restricted due to the absence of a signed-in session. Authorization to view the record necessitates an active. <a href="sign_in.html" style="color: blue; text-decoration: underline;">Sign In</a></p>
+    </div>
+</div>
+</div>
+
+<!-- Search Bar and Disease Types -->
+<div class="info-page">
+    <div class="w3-row-padding w3-padding-64 w3-container custom-search">
+        <div class="w3-content">
+            <div class="w3-twothird">
+                <h1>Heart Disease Information</h1>
+                <p>Search for a type of heart disease or symptom:</p>
+                <form class="w3-container" id="search-form">
+                    <input class="w3-input w3-border" type="text" placeholder="Search..." id="search-input">
+                    <button class="w3-button w3-black w3-margin-top" type="submit">Search</button>
+                </form>
+                <h2>Heart Disease Types</h2>
+                <ul class="w3-ul" id="disease-types-list">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- JavaScript -->
+<script>
+    // Fetch disease types from the .owl file and populate the list
+    fetch('disease-types.owl')
+        .then(response => response.text())
+        .then(data => {
+            const diseaseTypesList = document.getElementById('disease-types-list');
+            const diseaseTypes = data.split('\n').filter(type => type.trim() !== '');
+            
+            diseaseTypes.forEach(type => {
+                const listItem = document.createElement('li');
+                listItem.textContent = type;
+                listItem.classList.add('disease-link');
+                listItem.dataset.disease = type.toLowerCase().replace(/\s/g, '-');
+                listItem.addEventListener('click', handleDiseaseClick);
+                diseaseTypesList.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error('Error fetching disease types:', error));
+
+    // Handle disease type click
+    function handleDiseaseClick(event) {
+        const selectedDisease = event.target.dataset.disease;
+        // Use the selected disease to fetch and display relevant information
+        // For now, let's just log the selected disease to the console
+        console.log('Selected Disease:', selectedDisease);
+    }
+
+    
+    const diseasesData = [
+            {
+                name: "Ankyrin-B-related Cardiac Arrhythmia",
+                definition: "A heart disease characterized by a broad spectrum of cardiac arrhythmias including; bradycardia, sinus arrhythmia, delayed conduction/conduction block, idiopathic ventricular fibrillation, and catecholaminergic polymorphic ventricular tachycardia that has_material_basis_in heterozygous mutation in ANK2 on chromosome 4q25-q26.",
+                symptoms: "Cardiac Arrest, Syncope",
+            },
+            {
+                name: "Atrial Heart Septal Defect",
+                definition: "A heart septal defect located_in in the septum that separates the two atria of the heart.",
+                symptoms: "Arrhythmia, Breathing problems, clubbing of fingers, cyanosis of fingers, Cyanosis, Delayed Milestones, Fatigue, Palpitation, Pulmonary Hypertension, Undiagnosed Cardia Murmur",
+            },
+            {
+                name: "Atrioventricular Septal Defect",
+                definition: "A congenital heart septal defect characterized by an abnormal or inadequate fusion of the superior and inferior endocardial cushions with the mid portion of the atrial septum and the muscular portion of the ventricular septum, thus allowing extra blood to circulate the lungs.",
+                symptoms: "Cyanosis, Dyspnea, Rapid Respiration",
+            },
+            {
+                name: "Autoimmune Cardiomyopathy",
+                definition: "An autoimmune disease of cardiovascular system that is characterized by deterioration of the function of the heart muscle.",
+                symptoms: "Arrhythmia, Breathing Problems, Chest Discomfort, Dizziness, Fatigue, Palpitation, Swelling Symptom, Undiagnosed Cardiac Murmur",
+            },
+            {
+                name: "Alcoholic Cardiomyopathy",
+                definition: "",
+                symptoms: "Breathing Problems, Chest Pain, Sizziness, Edema, Fatigue, Weakness",
+            },
+            {
+                name: "Fiedler's Myocarditis",
+                definition: "",
+                symptoms: "Arrhythmia, Breathing problem, Chest Pain, Fatigue, Myocarditis",
+            },
+            {
+                name: "Septic Myocarditis",
+                definition: "An acute myocarditis that is characterized by an underlying infectious insult to the myocardium that induces acute inflammation.",
+                symptoms: "Arrhythmia, Chest Pain, Confusion, Dyspnea, Fatigue, Fever, Joint Pain, Low Blood Pressure, Muschle Ache, Myocarditis, Nausea, Vomiting",
+            },
+            {
+                name: "Toxic Myocarditis",
+                definition: "An acute myocarditis that is characterized by an underlying toxin insult to the myocardium that induces acute inflammation.",
+                symptoms: "Chest Discomfort, Fatigue, Myocarditis, Nausea, Palpitation, Vomiting",
+            },
+            {
+                name: "Interstitial Myocarditis",
+                definition: "",
+                symptoms: "Chest Discomfort, Edema, Fatigue, Mild Fever, Palpitation, Weight Gain ",
+            },
+            {
+                name: "Rheumatic Myocarditis",
+                definition: "",
+                symptoms: "Streptococcus, Chest Pain, Inflammation, Joint Pain, Palpitation ",
+            },
+            {
+                name: "Arrhythmogenic Right Ventricular Cardiomyopathy",
+                definition: "An intrinsic cardiomyopathy that is characterized by hypokinetic areas involving the free wall of the right ventricle, with fibrofatty replacement of the right ventricular myocardium, with associated arrhythmias originating in the right ventricle.",
+                symptoms: "Arrhythmia, Breathing Problems, Cardiac Arrest, Chest Pain, Fatigue, Palpitation, Swelling Symptom, Suncoope, Undiagnosed Cardiac Murmur",
+            },
+            {
+                name: "Dilated cardiomyopathy",
+                definition: "An intrinsic cardiomyopathy that is characterized by an an enlarged heart and damage to the myocardium causing the heart to pump blood inefficiently.",
+                symptoms: "Breathing Problems, Cardiac Arrest, Chest Discomfort, Cough, Sizziness, Dyspnea, Edema, Fatigue, Palpitation, Swelling Symptom, Weight Gain",
+            },
+            {
+                name: "X-linked dilated cardiomyopathy",
+                definition: "A dilated cardiomyopathy that has_material_basis_in mutation in the gene encoding dystrophin (DMD) on chromosome Xp21, without skeletal muscle weakness or wasting.",
+                symptoms: "Chest Pain, Fatigue, Lightheadedness, Palpitation, Weakness",
+            },
+            {
+                name: "Peripartum cardiomyopathy",
+                definition: "A dilated cardiomyopathy that is characterized by a weakness of the heart muscle that begins sometime during the final month of pregnancy through about five months after delivery.",
+                symptoms: "Muscle Weakness, Dyspnea, Edema, Fatigue, Arrhythmia, Chest Pain, Cough, Abdominal Discomfort",
+            },
+            {
+                name: "Hypertrophic cardiomyopathy",
+                definition: "An intrinsic cardiomyopathy that is characterized by abnormal thickening (hypertrophy) of the heart without any obvious cause.",
+                symptoms: "Chest Pain, Edema, Fatigue, Lightheadedness, Palpitation, Weakness, Undiagnosed Cardiac Murmur, Weakness",
+            },
+            {
+                name: "Infantile hypertrophic cardiomyopathy",
+                definition: "A hypertrophic cardiomyopathy characterized by isolated hypertrophic cardiomyopathy and congestive heart failure that has_material_basis_in mutation in the overlapping mitochondrial genes MTATP6 and MTATP8.",
+                symptoms: "Breathing Problem, Change in Skin Color, Failure to thrive, Feeding Difficulties and Mismanagement, Irritability, Sweaty, Undiagnosed Cardiac Murmur",
+            },
+            {
+                name: "Long QT syndrome",
+                definition: "An autosomal genetic disease that is characterized by delayed repolarization of the heart following a heartbeat increases the risk of episodes of torsade de pointes (TDP, a form of irregular heartbeat that originates from the ventricles).",
+                symptoms: "Arrhythmia, Cardiac Arrest, Palpitation, Seizure, Syncope",
+            },
+            {
+                name: "Andersen-Tawil syndrome",
+                definition: "A long QT syndrome that has_material_basis_in autosomal dominant inheritance of a mutation in the KCNJ2 gene which disrupts the rhythm of the heart's lower chambers (ventricular arrhythmia) and results_in an unusually small lower jaw (micrognathia), low-set ears, and an abnormal curvature of the fingers called clinodactyly.",
+                symptoms: "Arrhythmia",
+            },
+            {
+                name: "Jervell-Lange Nielsen syndrome",
+                definition: "",
+                symptoms: "Cardiac Arrest, Prolonged Fever, Seizure, Syncope",
+            },
+            {
+                name: "Restrictive cardiomyopathy",
+                definition: "An intrinsic cardiomyopathy characterized by impaired ventricular filling, with normal or decreased diastolic volume of either or both ventricles typically resulting from increased stiffness of the myocardium.",
+                symptoms: "Chest Discomfort, Dyspnea, Edema, Fatigue, Palpitaion, Syncope, Weakness, Wheezing",
+            },
+            {
+                name: "Loeffler endocarditis",
+                definition: "A restrictive cardiomyopathy that affects the endocardium and occurs with white blood cell proliferation, specifically of eosinophils.",
+                symptoms: "Chest Pain, Endocarditis,, Fatigue, Fever, Palpitation, Undiagnosed Cardiac Murmur",
+            },
+            {
+                name: "Endomyocardial fibrosis",
+                definition: "",
+                symptoms: "Chest Pain, Dyspnea, Edema,, Fatigue, Palpitation, Weakness",
+            },
+            {
+                name: "Congenital heart disease",
+                definition: "",
+                symptoms: "Abnormality of prenatal development or birth",
+            },
+            {
+                name: "",
+                definition: "",
+                symptoms: "",
+            },
+            
+        ];
+
+    function generateDiseaseBoxHTML(data) {
+        return `
+            <li class="disease-box" data-disease="${data.name.toLowerCase().replace(/\s/g, '-')}">
+                ${data.name}
+                <div class="popup-box" id="popup-${data.name.toLowerCase().replace(/\s/g, '-')}">
+                    <span class="popup-close" data-disease="${data.name.toLowerCase().replace(/\s/g, '-')}">&times;</span>
+                    <p><strong>Name:</strong> ${data.name}</p>
+                    <p><strong>Definition:</strong> ${data.definition}</p>
+                    <p><strong>Symptoms:</strong> ${data.symptoms}</p>
+                </div>
+            </li>
+        `;
+    }
+
+
+        // Variable to track the currently open pop-up
+        let currentOpenPopup = null;
+
+        // Function to open the pop-up for a disease
+        function openPopup(disease) {
+            // Close the currently open pop-up if one exists
+            if (currentOpenPopup) {
+                closePopup(currentOpenPopup);
+            }
+
+            const popup = document.getElementById(`popup-${disease}`);
+            popup.style.display = "block";
+            currentOpenPopup = disease;
+        }
+
+        // Function to close the pop-up for a disease
+        function closePopup(disease) {
+            const popup = document.getElementById(`popup-${disease}`);
+            popup.style.display = "none";
+            currentOpenPopup = null;
+        }
+
+        // Function to toggle the pop-up when clicking on a disease box
+        function togglePopup(disease) {
+            const popup = document.getElementById(`popup-${disease}`);
+            if (popup.style.display === "block") {
+                closePopup(disease);
+            } else {
+                openPopup(disease);
+            }
+        }
+
+        
+
+        // Add click event listeners to close buttons in pop-up boxes
+        const closeButtons = document.querySelectorAll(".popup-close");
+        closeButtons.forEach(button => {
+            const disease = button.getAttribute("data-disease");
+            button.addEventListener("click", () => closePopup(disease));
+        });
+
+        // Generate and display disease boxes based on the data
+        const diseaseTypesList = document.getElementById('disease-types-list');
+        diseasesData.forEach(data => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = generateDiseaseBoxHTML(data);
+            diseaseTypesList.appendChild(listItem);
+        });
+
+        // Add click event listeners to disease boxes to toggle pop-up boxes
+        const diseaseBoxes = document.querySelectorAll(".disease-box");
+        diseaseBoxes.forEach(box => {
+            const disease = box.getAttribute("data-disease");
+            box.addEventListener("click", () => togglePopup(disease));
+        });
+
+
+        // Close pop-up boxes when clicking anywhere outside of them
+        document.addEventListener("click", event => {
+            if (event.target.classList.contains("popup-box")) {
+                event.target.style.display = "none";
+                const disease = event.target.getAttribute("data-disease");
+                closePopup(disease);
+            }
+        });
+</script>
+
+</body>
+</html>
+
